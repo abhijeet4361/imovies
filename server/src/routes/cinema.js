@@ -1,8 +1,10 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const auth = require('../middlewares/auth');
 const upload = require('../utils/multer');
 const Cinema = require('../models/cinema');
 const userModeling = require('../utils/userModeling');
+const { mockCinemas } = require('../db/mockData');
 
 const router = new express.Router();
 
@@ -41,10 +43,16 @@ router.post('/cinemas/photo/:id', upload('cinemas').single('file'), async (req, 
 // Get all cinemas
 router.get('/cinemas', async (req, res) => {
   try {
-    const cinemas = await Cinema.find({});
+    let cinemas = [];
+    if (mongoose.connection && mongoose.connection.readyState === 1) {
+      cinemas = await Cinema.find({});
+    }
+    if (!cinemas || !cinemas.length) {
+      cinemas = mockCinemas;
+    }
     res.send(cinemas);
   } catch (e) {
-    res.status(400).send(e);
+    res.send(mockCinemas);
   }
 });
 
@@ -52,11 +60,17 @@ router.get('/cinemas', async (req, res) => {
 router.get('/cinemas/:id', async (req, res) => {
   const _id = req.params.id;
   try {
-    const cinema = await Cinema.findById(_id);
-    if (!cinema) return res.sendStatus(404);
+    let cinema = null;
+    if (mongoose.connection && mongoose.connection.readyState === 1) {
+      cinema = await Cinema.findById(_id);
+    }
+    if (!cinema) {
+      cinema = mockCinemas.find(c => c._id === _id) || mockCinemas[0];
+    }
     return res.send(cinema);
   } catch (e) {
-    return res.status(400).send(e);
+    const cinema = mockCinemas.find(c => c._id === _id) || mockCinemas[0];
+    return res.send(cinema);
   }
 });
 

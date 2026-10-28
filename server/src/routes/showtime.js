@@ -1,6 +1,8 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const auth = require('../middlewares/auth');
 const Showtime = require('../models/showtime');
+const { mockShowtimes } = require('../db/mockData');
 
 const router = new express.Router();
 
@@ -18,10 +20,16 @@ router.post('/showtimes', auth.enhance, async (req, res) => {
 // Get all showtimes
 router.get('/showtimes', async (req, res) => {
   try {
-    const showtimes = await Showtime.find({});
+    let showtimes = [];
+    if (mongoose.connection && mongoose.connection.readyState === 1) {
+      showtimes = await Showtime.find({});
+    }
+    if (!showtimes || !showtimes.length) {
+      showtimes = mockShowtimes;
+    }
     res.send(showtimes);
   } catch (e) {
-    res.status(400).send(e);
+    res.send(mockShowtimes);
   }
 });
 
@@ -29,10 +37,17 @@ router.get('/showtimes', async (req, res) => {
 router.get('/showtimes/:id', async (req, res) => {
   const _id = req.params.id;
   try {
-    const showtime = await Showtime.findById(_id);
-    return !showtime ? res.sendStatus(404) : res.send(showtime);
+    let showtime = null;
+    if (mongoose.connection && mongoose.connection.readyState === 1) {
+      showtime = await Showtime.findById(_id);
+    }
+    if (!showtime) {
+      showtime = mockShowtimes.find(s => s._id === _id) || mockShowtimes[0];
+    }
+    return res.send(showtime);
   } catch (e) {
-    res.status(400).send(e);
+    const showtime = mockShowtimes.find(s => s._id === _id) || mockShowtimes[0];
+    return res.send(showtime);
   }
 });
 

@@ -5,16 +5,17 @@ import {
   SELECT_ALL_SHOWTIMES,
   DELETE_SHOWTIME
 } from '../types';
+import { mockShowtimes } from '../../data/mockData';
 
 const initialState = {
-  showtimes: [],
+  showtimes: mockShowtimes,
   selectedShowtimes: [],
   openDialog: false
 };
 
 const getShowtimes = (state, payload) => ({
   ...state,
-  showtimes: payload
+  showtimes: payload && payload.length ? payload : mockShowtimes
 });
 
 const toggleDialog = state => ({

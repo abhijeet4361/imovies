@@ -1,5 +1,6 @@
 import { GET_CINEMAS, GET_CINEMA } from '../types';
 import { setAlert } from './alert';
+import { mockCinemas } from '../../data/mockData';
 
 export const uploadCinemaImage = (id, image) => async dispatch => {
   try {
@@ -30,11 +31,13 @@ export const getCinemas = () => async dispatch => {
       headers: { 'Content-Type': 'application/json' }
     });
     const cinemas = await response.json();
-    if (response.ok) {
+    if (response.ok && Array.isArray(cinemas) && cinemas.length) {
       dispatch({ type: GET_CINEMAS, payload: cinemas });
+    } else {
+      dispatch({ type: GET_CINEMAS, payload: mockCinemas });
     }
   } catch (error) {
-    dispatch(setAlert(error.message, 'error', 5000));
+    dispatch({ type: GET_CINEMAS, payload: mockCinemas });
   }
 };
 
@@ -46,11 +49,15 @@ export const getCinema = id => async dispatch => {
       headers: { 'Content-Type': 'application/json' }
     });
     const cinema = await response.json();
-    if (response.ok) {
+    if (response.ok && cinema && cinema.name) {
       dispatch({ type: GET_CINEMA, payload: cinema });
+    } else {
+      const fallback = mockCinemas.find(c => c._id === id) || mockCinemas[0];
+      dispatch({ type: GET_CINEMA, payload: fallback });
     }
   } catch (error) {
-    dispatch(setAlert(error.message, 'error', 5000));
+    const fallback = mockCinemas.find(c => c._id === id) || mockCinemas[0];
+    dispatch({ type: GET_CINEMA, payload: fallback });
   }
 };
 

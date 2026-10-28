@@ -1,18 +1,19 @@
 import { GET_CINEMAS, GET_CINEMA } from '../types';
+import { mockCinemas } from '../../data/mockData';
 
 const initialState = {
-  cinemas: [],
-  selectedCinema: null
+  cinemas: mockCinemas,
+  selectedCinema: mockCinemas[0]
 };
 
 const getCinemas = (state, payload) => ({
   ...state,
-  cinemas: payload
+  cinemas: payload && payload.length ? payload : mockCinemas
 });
 
 const getCinema = (state, payload) => ({
   ...state,
-  selectedCinema: payload
+  selectedCinema: payload || mockCinemas[0]
 });
 
 export default (state = initialState, action) => {

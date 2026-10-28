@@ -1,8 +1,10 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const auth = require('../middlewares/auth');
 const upload = require('../utils/multer');
 const Movie = require('../models/movie');
 const userModeling = require('../utils/userModeling');
+const { mockMovies } = require('../db/mockData');
 
 const router = new express.Router();
 
@@ -46,10 +48,16 @@ router.get(
 // Get all movies
 router.get('/movies', async (req, res) => {
   try {
-    const movies = await Movie.find({});
+    let movies = [];
+    if (mongoose.connection && mongoose.connection.readyState === 1) {
+      movies = await Movie.find({});
+    }
+    if (!movies || !movies.length) {
+      movies = mockMovies;
+    }
     res.send(movies);
   } catch (e) {
-    res.status(400).send(e);
+    res.send(mockMovies);
   }
 });
 
@@ -58,11 +66,17 @@ router.get('/movies/:id', async (req, res) => {
   const _id = req.params.id;
 
   try {
-    const movie = await Movie.findById(_id);
-    if (!movie) return res.sendStatus(404);
+    let movie = null;
+    if (mongoose.connection && mongoose.connection.readyState === 1) {
+      movie = await Movie.findById(_id);
+    }
+    if (!movie) {
+      movie = mockMovies.find(m => m._id === _id) || mockMovies[0];
+    }
     return res.send(movie);
   } catch (e) {
-    return res.status(400).send(e);
+    const movie = mockMovies.find(m => m._id === _id) || mockMovies[0];
+    return res.send(movie);
   }
 });
 

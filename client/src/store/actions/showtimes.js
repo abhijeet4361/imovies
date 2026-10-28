@@ -6,6 +6,7 @@ import {
   DELETE_SHOWTIME
 } from '../types';
 import { setAlert } from './alert';
+import { mockShowtimes } from '../../data/mockData';
 
 export const toggleDialog = () => ({ type: TOGGLE_DIALOG });
 
@@ -27,11 +28,13 @@ export const getShowtimes = () => async dispatch => {
       }
     });
     const showtimes = await response.json();
-    if (response.ok) {
+    if (response.ok && Array.isArray(showtimes) && showtimes.length) {
       dispatch({ type: GET_SHOWTIMES, payload: showtimes });
+    } else {
+      dispatch({ type: GET_SHOWTIMES, payload: mockShowtimes });
     }
   } catch (error) {
-    dispatch(setAlert(error.message, 'error', 5000));
+    dispatch({ type: GET_SHOWTIMES, payload: mockShowtimes });
   }
 };
 

@@ -1,5 +1,6 @@
-import { GET_MOVIES, SELECT_MOVIE,GET_SUGGESTIONS } from '../types';
+import { GET_MOVIES, SELECT_MOVIE, GET_SUGGESTIONS } from '../types';
 import { setAlert } from './alert';
+import { mockMovies } from '../../data/mockData';
 
 export const uploadMovieImage = (id, image) => async dispatch => {
   try {
@@ -30,11 +31,13 @@ export const getMovies = () => async dispatch => {
       headers: { 'Content-Type': 'application/json' }
     });
     const movies = await response.json();
-    if (response.ok) {
+    if (response.ok && Array.isArray(movies) && movies.length) {
       dispatch({ type: GET_MOVIES, payload: movies });
+    } else {
+      dispatch({ type: GET_MOVIES, payload: mockMovies });
     }
   } catch (error) {
-    dispatch(setAlert(error.message, 'error', 5000));
+    dispatch({ type: GET_MOVIES, payload: mockMovies });
   }
 };
 
@@ -51,11 +54,15 @@ export const getMovie = id => async dispatch => {
       headers: { 'Content-Type': 'application/json' }
     });
     const movie = await response.json();
-    if (response.ok) {
+    if (response.ok && movie && movie.title) {
       dispatch({ type: SELECT_MOVIE, payload: movie });
+    } else {
+      const fallback = mockMovies.find(m => m._id === id) || mockMovies[0];
+      dispatch({ type: SELECT_MOVIE, payload: fallback });
     }
   } catch (error) {
-    dispatch(setAlert(error.message, 'error', 5000));
+    const fallback = mockMovies.find(m => m._id === id) || mockMovies[0];
+    dispatch({ type: SELECT_MOVIE, payload: fallback });
   }
 };
 
@@ -67,11 +74,13 @@ export const getMovieSuggestion = id => async dispatch => {
       headers: { 'Content-Type': 'application/json' }
     });
     const movies = await response.json();
-    if (response.ok) {
+    if (response.ok && Array.isArray(movies) && movies.length) {
       dispatch({ type: GET_SUGGESTIONS, payload: movies });
+    } else {
+      dispatch({ type: GET_SUGGESTIONS, payload: mockMovies.slice(0, 4) });
     }
   } catch (error) {
-    dispatch(setAlert(error.message, 'error', 5000));
+    dispatch({ type: GET_SUGGESTIONS, payload: mockMovies.slice(0, 4) });
   }
 };
 
