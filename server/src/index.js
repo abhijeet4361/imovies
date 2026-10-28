@@ -53,7 +53,13 @@ app.use(invitationsRouter);
 
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
+const fs = require('fs');
 app.get('/*', (req, res) => {
-  res.sendFile(path.join(__dirname + '../../client/build/index.html'));
+  const clientBuildPath = path.join(__dirname, '../../client/build/index.html');
+  if (fs.existsSync(clientBuildPath)) {
+    res.sendFile(clientBuildPath);
+  } else {
+    res.status(404).json({ error: 'Endpoint not found' });
+  }
 });
 app.listen(port, () => console.log(`app is running in PORT: ${port}`));

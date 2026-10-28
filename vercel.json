@@ -1,22 +1,24 @@
 {
-  "version": 2,
-  "buildCommand": "cd client && npm install && npm run build",
-  "outputDirectory": "client/build",
-  "installCommand": "npm install && cd server && npm install && cd ..",
-  "functions": {
-    "api/index.js": {
-      "maxDuration": 30,
-      "includeFiles": "server/**"
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "client": {
+      "root": "client",
+      "framework": "create-react-app"
+    },
+    "server": {
+      "root": "server",
+      "framework": "express"
     }
   },
   "rewrites": [
-    { "source": "/users/:path*", "destination": "/api" },
-    { "source": "/movies/:path*", "destination": "/api" },
-    { "source": "/cinemas/:path*", "destination": "/api" },
-    { "source": "/showtimes/:path*", "destination": "/api" },
-    { "source": "/reservations/:path*", "destination": "/api" },
-    { "source": "/invitations/:path*", "destination": "/api" },
-    { "source": "/uploads/:path*", "destination": "/api" },
-    { "source": "/((?!api|_next|static|favicon\\.ico).*)", "destination": "/index.html" }
+    { "source": "/users(.*)", "destination": { "service": "server" } },
+    { "source": "/movies(.*)", "destination": { "service": "server" } },
+    { "source": "/cinemas(.*)", "destination": { "service": "server" } },
+    { "source": "/showtimes(.*)", "destination": { "service": "server" } },
+    { "source": "/reservations(.*)", "destination": { "service": "server" } },
+    { "source": "/invitations(.*)", "destination": { "service": "server" } },
+    { "source": "/uploads(.*)", "destination": { "service": "server" } },
+    { "source": "/api/(.*)", "destination": { "service": "server" } },
+    { "source": "/(.*)", "destination": { "service": "client" } }
   ]
 }
