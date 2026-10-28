@@ -1,0 +1,18 @@
+{
+  "deployments": [
+    {
+      "id": 1,
+      "name": "iMovies - Production 1",
+      "repository": "https://github.com/abhijeet4361/imovies",
+      "public_url": "https://imovies-gfix.vercel.app/#/",
+      "status": "live"
+    },
+    {
+      "id": 2,
+      "name": "iMovies - Production 2",
+      "repository": "https://github.com/ag184185-svg/imovies",
+      "public_url": "https://imovies-smoky.vercel.app/",
+      "status": "live"
+    }
+  ]
+}
